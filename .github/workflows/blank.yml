@@ -1,0 +1,16 @@
+name: test and deploy
+on:
+  push:
+    branches: 
+      - main
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: SSH
+        uses: garygrossgarten/github-action-ssh@release
+        with:
+          privateKey: ${{ secrets.SSH_PRIVATE_KEY }} 
+          username: ${{ secrets.USERNAME }} 
+          host: ${{ secrets.SERVER }} 
+          command : cd lysandeAPI && ./deploy.sh
