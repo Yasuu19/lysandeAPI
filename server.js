@@ -1,6 +1,7 @@
 import express from 'express';
 import mongoose from 'mongoose';
 import charactersRouter from './routes/characters.js';
+import dotenv from 'dotenv';
 
 
 //Routes
@@ -10,8 +11,11 @@ import charactersRouter from './routes/characters.js';
 ///////////////// Initialisation ////////////////
 const app  = express(); 
 const port = 3001;
+dotenv.config();
+const dbURL = process.env.DB_URL || 'localhost';
+console.log('dbURL', dbURL);
 
-mongoose.connect('mongodb://localhost/lysande')
+mongoose.connect(`mongodb://${dbURL}/lysande`);
 const db = mongoose.connection; 
 db.on('error', error => console.error(error));
 db.once('open', () => console.error("⚡️[DB]: Database MongoDB is connected"));
