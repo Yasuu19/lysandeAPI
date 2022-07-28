@@ -9,7 +9,7 @@ import charactersRouter from './routes/characters.js';
 
 ///////////////// Initialisation ////////////////
 const app  = express(); 
-const port = 8080;
+const port = 3001;
 
 mongoose.connect('mongodb://localhost/lysande')
 const db = mongoose.connection; 
