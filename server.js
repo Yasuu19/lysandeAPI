@@ -13,8 +13,6 @@ const app  = express();
 const port = 3001;
 dotenv.config();
 const dbURL = process.env.DB_URL || 'localhost';
-console.log('dbURL', dbURL);
-
 mongoose.connect(`mongodb://${dbURL}/lysande`);
 const db = mongoose.connection; 
 db.on('error', error => console.error(error));
