@@ -21,12 +21,12 @@ db.once('open', () => console.error("⚡️[DB]: Database MongoDB is connected")
 
 /////////// Middlewares //////////////////////
 app.use(express.json())
-app.use('/characters', charactersRouter);
-
-//Permet les requêtes cross-origin
 app.use(cors({
   origin: '*'
 }));
+app.use('/characters', charactersRouter);
+
+//Permet les requêtes cross-origin
 
 app.listen(port, () => {
     console.log(`⚡️[server]: Server is running at https://localhost:${port}`);
