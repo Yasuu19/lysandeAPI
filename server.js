@@ -25,7 +25,7 @@ app.use('/characters', charactersRouter);
 
 //Permet les requêtes cross-origin
 app.use(cors({
-  origin: 'https://lysande.pepintrie.fr'
+  origin: '*'
 }));
 
 app.listen(port, () => {
