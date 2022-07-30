@@ -2,4 +2,4 @@ FROM node:latest
 WORKDIR /app
 COPY . .
 RUN npm install
-RUN npm run start
+ENTRYPOINT npm run start
