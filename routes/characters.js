@@ -1,10 +1,7 @@
 /* Le dossier s'apelle routes car c'est ce qui est utilisé mais c'est le controller (MVC) */
 
 import express  from 'express';
-import {createCharacter} from '../controllers/characters.js'
-import {modifyCharacter} from '../controllers/characters.js'
-import {deleteCharacter} from '../controllers/characters.js'
-import {getAllCharacters} from '../controllers/characters.js'
+import {createCharacter, modifyCharacter, deleteCharacter, getAllCharacters} from '../controllers/characters.js'
 //import {getCharacter} from '../controllers/characters.js'
 import bodyParser from 'body-parser'
 import Character from '../models/character.js';

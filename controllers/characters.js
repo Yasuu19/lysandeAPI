@@ -3,6 +3,7 @@ import Character from '../models/character.js';
 
 export async function createCharacter (req, res) {
     console.log("Création du personnage en cours...");
+    if (Object.keys(req.body).length){
         const character = new Character({
             player : req.body.player,
             name : req.body.name,
@@ -11,23 +12,27 @@ export async function createCharacter (req, res) {
             level : req.body.level,
             img : req.body.img,
             culte : req.body.culte,
-            x : req.body.x,
-            y : req.body.y,
-            map : req.body.map,
-            group : req.body.group,
+            x : (req.body.positions && req.body.positions.coordinates) ? req.body.positions.coordinates.x : undefined,
+            y : (req.body.positions && req.body.positions.coordinates) ? req.body.positions.coordinates.y : undefined,
+            map : req.body.positions ? req.body.positions.map : undefined,
+            group : req.body.positions ? req.body.positions.group : undefined,
             quest : req.body.quest,
             story : req.body.story,
-            moral : req.body.moral,
-            law : req.body.law,
+            moral : req.body.alignment ? req.body.alignment.moral : undefined,
+            law : req.body.alignment ? req.body.alignment.law : undefined,
             gold : req.body.gold,
         });
         try {
             const newCharacter = await character.save();
-            res.status(201).json({ message : `Character ${character.name} created` });
+            res.status(201).json(newCharacter);
         } catch (err) {
                 console.log(`{${err}}`)
                 res.status(400).json(`Error when creating a new character ${err}`);
         }
+    }
+    else {
+        res.status(400).json(`Body is required`);
+    }
 
 };
 

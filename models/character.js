@@ -33,19 +33,19 @@ const characterSchema = new mongoose.Schema ({
     },
     x: {
         type : Number,
-        required : true
+        required : false
     },
     y: {
         type : Number,
-        required : true
+        required : false
     },
     map: {
         type : String,
-        required : true
+        required : false
     },
     group : {
         type : Number, 
-        required : true
+        required : false
 
     },
     quest: {
