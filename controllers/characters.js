@@ -1,6 +1,18 @@
 /* Logique métier */
 import Character from '../models/character.js';
 
+const formatPosition = (character) => {
+    return (character.x && character.y && character.map && character.group)?
+    {
+        coordinates : {
+            x : character.x,
+            y : character.y
+        },
+        map : character.map,
+        group : character.group
+    } : undefined;
+}
+
 export async function createCharacter (req, res) {
     console.log("Création du personnage en cours...");
     if (Object.keys(req.body).length){
@@ -66,16 +78,6 @@ export const getAllCharacters = async (req, res) => {
         //Send back all characters find in the DB
         const characters = await Character.find({});
         res.status(200).json(characters.map(el => {
-            const positions = (el.x && el.y && el.map && el.group)?
-            {
-                coordinates : {
-                    x : el.x,
-                    y : el.y
-                },
-                map : el.map,
-                group : el.group
-            } : undefined;
-
             return ({
                 id : el._id,
                 player : el.player, 
@@ -85,7 +87,7 @@ export const getAllCharacters = async (req, res) => {
                 level : el.level,
                 img : el.img,
                 culte : el.culte,
-                positions,
+                positions : formatPosition(el),
                 quest : el.quest,
                 story : el.story,
                 alignment : {
@@ -98,5 +100,34 @@ export const getAllCharacters = async (req, res) => {
     } catch (err) {
         console.log(`{${err}}`)
         res.status(400).json(`${err}`);
+    }
+}
+
+
+export const getCharacterById = async (req, res) => {
+    try {
+        //Cherche dans le model Character le character correspondants aux critères entrés dans find
+        const character = await Character.findOne({_id : req.params.id});
+        res.status(200).json({
+            id : character._id,
+            player : character.player, 
+            name : character.name,
+            race : character.race,
+            job : character.job,
+            level : character.level,
+            img : character.img,
+            culte : character.culte,
+            positions : formatPosition(character),
+            quest : character.quest,
+            story : character.story,
+            alignment : {
+                moral : character.moral,
+                law : character.law
+            },
+            gold : character.gold,
+        });
+    } catch (err) {
+        console.log(`{${err}}`)
+        res.status(404).json(`${err}`);
     }
 }

@@ -1,7 +1,7 @@
 /* Le dossier s'apelle routes car c'est ce qui est utilisé mais c'est le controller (MVC) */
 
 import express  from 'express';
-import {createCharacter, modifyCharacter, deleteCharacter, getAllCharacters} from '../controllers/characters.js'
+import {createCharacter, modifyCharacter, deleteCharacter, getAllCharacters, getCharacterById} from '../controllers/characters.js'
 //import {getCharacter} from '../controllers/characters.js'
 import bodyParser from 'body-parser'
 import Character from '../models/character.js';
@@ -26,16 +26,7 @@ router.delete('/:id', deleteCharacter);
 router.get('/', getAllCharacters);
 
 //Get specific character Route
-router.get('/:id', async function (req, res) {
-        try {
-            //Cherche dans le model Character le character correspondants aux critères entrés dans find
-            const characters = await Character.findOne({_id : req.params.id});
-            res.status(200).json({characters : characters});
-        } catch (err) {
-            console.log(`{${err}}`)
-            res.status(404).json(`${err}`);
-        }
-    });
-// Si on exporte pas les routes, le server ne peut pas les utiliser !*/
+router.get('/:id', getCharacterById);
 
+// Si on exporte pas les routes, le server ne peut pas les utiliser !*/
 export default router;
