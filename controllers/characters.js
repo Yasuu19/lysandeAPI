@@ -10,7 +10,7 @@ export async function createCharacter (req, res) {
             race : req.body.race,
             job : req.body.job,
             level : req.body.level,
-            img : req.body.img,
+            img : 'https://nnsprod.com/naheulbeuk/images/gob.png',
             culte : req.body.culte,
             x : (req.body.positions && req.body.positions.coordinates) ? req.body.positions.coordinates.x : undefined,
             y : (req.body.positions && req.body.positions.coordinates) ? req.body.positions.coordinates.y : undefined,
@@ -65,16 +65,38 @@ export const getAllCharacters = async (req, res) => {
     try {
         //Send back all characters find in the DB
         const characters = await Character.find({});
-        res.status(200).json({characters : characters});
+        res.status(200).json(characters.map(el => {
+            const positions = (el.x && el.y && el.map && el.group)?
+            {
+                coordinates : {
+                    x : el.x,
+                    y : el.y
+                },
+                map : el.map,
+                group : el.group
+            } : undefined;
+
+            return ({
+                id : el._id,
+                player : el.player, 
+                name : el.name,
+                race : el.race,
+                job : el.job,
+                level : el.level,
+                img : el.img,
+                culte : el.culte,
+                positions,
+                quest : el.quest,
+                story : el.story,
+                alignment : {
+                    moral : el.moral,
+                    law : el.law
+                },
+                gold : el.gold,
+            })
+        }));
     } catch (err) {
         console.log(`{${err}}`)
         res.status(400).json(`${err}`);
-        //.redirect('/');
     }
 }
-
-// NE MARCHE PAS
-
-//export async function getCharacter{{
-//    }
-//}
