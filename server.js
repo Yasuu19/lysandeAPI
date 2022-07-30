@@ -4,14 +4,10 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import charactersRouter from './routes/characters.js';
 
-// Routes
-
-// const indexRouter = require('./routes/characters');
-
-/// ////////////// Initialisation ////////////////
+dotenv.config();
 const app = express();
 const port = 3001;
-dotenv.config();
+
 const dbURL = process.env.DB_URL || 'localhost';
 mongoose.connect(`mongodb://${dbURL}/lysande`);
 const db = mongoose.connection;
@@ -20,7 +16,6 @@ db.once('open', () => console.error('⚡️[DB]: Database MongoDB is connected')
 
 /// //////// Middlewares //////////////////////
 app.use(express.json());
-// Permet les requêtes cross-origin
 app.use(cors({ origin: '*' }));
 app.use('/characters', charactersRouter);
 

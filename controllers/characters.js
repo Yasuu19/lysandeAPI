@@ -1,8 +1,7 @@
 /* eslint-disable no-await-in-loop */
-/* Logique métier */
 import Character from '../models/character.js';
 
-const formatPosition = (character) => {
+const FormatPositionForSending = (character) => {
   if (
     (character.x || character.x === 0)
         && (character.y || character.y === 0)
@@ -46,7 +45,7 @@ const formatRequestPosition = (data) => {
   return {};
 };
 
-const formatCharacter = (character) => ({
+const FormatSending = (character) => ({
   id: character._id,
   player: character.player,
   name: character.name,
@@ -55,7 +54,7 @@ const formatCharacter = (character) => ({
   level: character.level,
   img: character.img,
   culte: character.culte ? character.culte : undefined,
-  positions: formatPosition(character),
+  positions: FormatPositionForSending(character),
   quest: character.quest,
   story: character.story,
   alignment: {
@@ -95,19 +94,17 @@ export async function createCharacter(req, res) {
   }
 }
 
-// NE MARCHE PAS
 export async function updateCharacters(req, res) {
   if (req.body.length) {
     const newCharacters = [];
     let error = '';
-
     for (let i = 0; i < req.body.length; i++) {
       const requestCharacter = formatRequest(req.body[i]);
       if (requestCharacter.id) {
         try {
           await Character.updateOne({ _id: requestCharacter.id }, requestCharacter);
           newCharacters.push(
-            formatCharacter(await Character.findOne({ _id: requestCharacter.id })),
+            FormatSending(await Character.findOne({ _id: requestCharacter.id })),
           );
         } catch (err) {
           error = err;
@@ -139,9 +136,8 @@ export async function deleteCharacter(req, res) {
 
 export const getAllCharacters = async (req, res) => {
   try {
-    // Send back all characters find in the DB
     const characters = await Character.find({});
-    res.status(200).json(characters.map((el) => formatCharacter(el)));
+    res.status(200).json(characters.map((el) => FormatSending(el)));
   } catch (err) {
     res.status(400).json(`${err}`);
   }
@@ -149,9 +145,8 @@ export const getAllCharacters = async (req, res) => {
 
 export const getCharacterById = async (req, res) => {
   try {
-    // Cherche dans le model Character le character correspondants aux critères entrés dans find
     const character = await Character.findOne({ _id: req.params.id });
-    res.status(200).json(character ? formatCharacter(character) : undefined);
+    res.status(200).json(character ? FormatSending(character) : undefined);
   } catch (err) {
     res.status(404).json(`${err}`);
   }

@@ -1,6 +1,5 @@
-// Librairie qui permet de se connecter à la BDD Mongo DB
 import mongoose from 'mongoose';
-// Same as table in NoSQL DB
+
 const characterSchema = new mongoose.Schema({
   player: {
     type: Number,
@@ -68,5 +67,5 @@ const characterSchema = new mongoose.Schema({
     required: true,
   },
 });
-// Character is the name of the table in DB
+
 export default mongoose.model('Character', characterSchema);
