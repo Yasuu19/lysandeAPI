@@ -2,7 +2,8 @@ import express from 'express';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import cors from 'cors';
-import charactersRouter from './routes/characters.js';
+import charactersRoutes from './routes/characters.js';
+import usersRoutes from './routes/users.js';
 
 dotenv.config();
 const app = express();
@@ -17,7 +18,8 @@ db.once('open', () => console.error('⚡️[DB]: Database MongoDB is connected')
 /// //////// Middlewares //////////////////////
 app.use(express.json());
 app.use(cors({ origin: '*' }));
-app.use('/characters', charactersRouter);
+app.use('/characters', charactersRoutes);
+app.use('/auth', usersRoutes);
 
 app.listen(port, () => {
   console.log(`⚡️[server]: Server is running at https://localhost:${port}`);

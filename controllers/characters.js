@@ -1,5 +1,5 @@
 /* eslint-disable no-await-in-loop */
-import Character from '../models/character.js';
+import Character from '../models/Character.js';
 
 const FormatPositionForSending = (character) => {
   if (
