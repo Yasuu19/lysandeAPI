@@ -8,9 +8,10 @@ export default async function (req, res, next) {
   try {
     const token = req.headers.authorization.split(' ')[1];
     const decodedToken = jwt.verify(token, secretTokenKey);
-    const { userId } = decodedToken;
+    const { userId, role } = decodedToken;
     req.auth = {
       userId,
+      role,
     };
     next();
   } catch (err) {

@@ -18,7 +18,8 @@ export async function signup(req, res) {
         password: hash,
       });
       await user.save();
-      res.status(201).json(user);
+      const { email, name, role } = user;
+      res.status(201).json({ email, name, role });
     } catch (err) {
       res.status(400).json(err);
     }
@@ -35,7 +36,6 @@ export async function login(req, res) {
       const valid = await bcrypt.compare(req.body.password, user.password);
       if (valid) {
         res.status(200).json({
-          userId: user._id,
           token: jwt.sign(
             {
               userId: user._id,

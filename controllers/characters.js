@@ -1,6 +1,11 @@
 /* eslint-disable no-await-in-loop */
 import Character from '../models/Character.js';
 
+const isPlayerCharacter = async (playerId, characterId) => {
+  const characterFromDB = await Character.findOne({ _id: characterId });
+  return characterFromDB.player === playerId;
+};
+
 const FormatPositionForSending = (character) => {
   if (
     (character.x || character.x === 0)
@@ -45,7 +50,7 @@ const formatRequestPosition = (data) => {
   return {};
 };
 
-const FormatSending = (character) => ({
+const formatSending = (character) => ({
   id: character._id,
   player: character.player,
   name: character.name,
@@ -82,10 +87,10 @@ const formatRequest = (data) => ({
 });
 export async function createCharacter(req, res) {
   if (Object.keys(req.body).length) {
-    const character = new Character(formatRequest(req.body));
+    const character = new Character(formatRequest({ ...req.body, player: req.auth.userId }));
     try {
       const newCharacter = await character.save();
-      res.status(201).json(newCharacter);
+      res.status(201).json(formatSending(newCharacter));
     } catch (err) {
       res.status(400).json(`Error when creating a new character ${err}`);
     }
@@ -96,48 +101,64 @@ export async function createCharacter(req, res) {
 
 export async function updateCharacters(req, res) {
   if (req.body.length) {
-    const newCharacters = [];
-    let error = '';
-    for (let i = 0; i < req.body.length; i++) {
-      const requestCharacter = formatRequest(req.body[i]);
-      if (requestCharacter.id) {
-        try {
-          await Character.updateOne({ _id: requestCharacter.id }, requestCharacter);
-          newCharacters.push(
-            FormatSending(await Character.findOne({ _id: requestCharacter.id })),
-          );
-        } catch (err) {
-          error = err;
+    if (
+      req.auth.role === 'admin'
+      || req.auth.role === 'gm'
+      || !(req.body.some((character) => !isPlayerCharacter(req.auth.userId, character.id)))
+    ) {
+      const newCharacters = [];
+      let error = '';
+      for (let i = 0; i < req.body.length; i++) {
+        const requestCharacter = formatRequest(req.body[i]);
+        if (requestCharacter.id) {
+          try {
+            await Character.updateOne({ _id: requestCharacter.id }, requestCharacter);
+            newCharacters.push(
+              formatSending(await Character.findOne({ _id: requestCharacter.id })),
+            );
+          } catch (err) {
+            error = err;
+            break;
+          }
+        } else {
+          error = 'Id is required';
           break;
         }
-      } else {
-        error = 'Id is required';
-        break;
       }
-    }
-    if (error) {
-      res.status(500).json(`${error}`);
+      if (error) {
+        res.status(500).json(`${error}`);
+      } else {
+        res.status(200).json(formatSending(newCharacters));
+      }
     } else {
-      res.status(200).json(newCharacters);
+      res.status(401).json('Unauthorized access');
     }
   } else {
-    res.status(400).json('Body require an array');
+    res.status(400).json('Body requires an array');
   }
 }
 
 export async function deleteCharacter(req, res) {
-  try {
-    await Character.deleteOne({ _id: req.params.id });
-    res.status(200).json(undefined);
-  } catch (err) {
-    res.status(500).json({ err });
+  if (
+    req.auth.role === 'admin'
+    || req.auth.role === 'gm'
+    || isPlayerCharacter(req.auth.userId, req.params.id)
+  ) {
+    try {
+      await Character.deleteOne({ _id: req.params.id });
+      res.status(200).json(undefined);
+    } catch (err) {
+      res.status(500).json({ err });
+    }
+  } else {
+    res.status(401).json('Unauthorized request');
   }
 }
 
 export const getAllCharacters = async (req, res) => {
   try {
     const characters = await Character.find({});
-    res.status(200).json(characters.map((el) => FormatSending(el)));
+    res.status(200).json(characters.map((el) => formatSending(el)));
   } catch (err) {
     res.status(400).json(`${err}`);
   }
@@ -146,7 +167,7 @@ export const getAllCharacters = async (req, res) => {
 export const getCharacterById = async (req, res) => {
   try {
     const character = await Character.findOne({ _id: req.params.id });
-    res.status(200).json(character ? FormatSending(character) : undefined);
+    res.status(200).json(character ? formatSending(character) : undefined);
   } catch (err) {
     res.status(404).json(`${err}`);
   }
