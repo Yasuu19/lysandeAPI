@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 
 const characterSchema = new mongoose.Schema({
   player: {
-    type: Number,
+    type: String,
     required: true,
   },
   name: {
