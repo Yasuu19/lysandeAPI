@@ -50,7 +50,7 @@ const formatRequestPosition = (data) => {
   return {};
 };
 
-const formatSending = (character) => ({
+export const formatSending = (character) => ({
   id: character._id,
   player: character.player,
   name: character.name,
@@ -85,6 +85,7 @@ const formatRequest = (data) => ({
   law: data.alignment ? data.alignment.law : null,
   gold: data.gold,
 });
+
 export async function createCharacter(req, res) {
   if (Object.keys(req.body).length) {
     const character = new Character(formatRequest({ ...req.body, player: req.auth.userId }));
@@ -131,7 +132,7 @@ export async function updateCharacters(req, res) {
         res.status(200).json(formatSending(newCharacters));
       }
     } else {
-      res.status(401).json('Unauthorized access');
+      res.status(403).json('Unauthorized access');
     }
   } else {
     res.status(400).json('Body requires an array');
@@ -151,7 +152,7 @@ export async function deleteCharacter(req, res) {
       res.status(500).json({ err });
     }
   } else {
-    res.status(401).json('Unauthorized request');
+    res.status(403).json('Unauthorized request');
   }
 }
 

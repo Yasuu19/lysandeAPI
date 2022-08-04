@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import charactersRoutes from './routes/characters.js';
 import usersRoutes from './routes/users.js';
+import authRoutes from './routes/auth.js';
 
 dotenv.config();
 const app = express();
@@ -19,7 +20,8 @@ db.once('open', () => console.error('⚡️[DB]: Database MongoDB is connected')
 app.use(express.json());
 app.use(cors({ origin: '*' }));
 app.use('/characters', charactersRoutes);
-app.use('/auth', usersRoutes);
+app.use('/auth', authRoutes);
+app.use('/users', usersRoutes);
 
 app.listen(port, () => {
   console.log(`⚡️[server]: Server is running at https://localhost:${port}`);
