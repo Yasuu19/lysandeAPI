@@ -1,5 +1,5 @@
 /* eslint-disable no-await-in-loop */
-import Character from '../models/Character.js';
+import Character from '../models/character.js';
 
 const isPlayerCharacter = async (playerId, characterId) => {
   const characterFromDB = await Character.findOne({ _id: characterId });
