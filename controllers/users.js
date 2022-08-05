@@ -1,5 +1,5 @@
 import { formatSending } from './characters.js';
-import Character from '../models/Character.js';
+import Character from '../models/character.js';
 import User from '../models/User.js';
 
 const formatUser = (data) => ({
