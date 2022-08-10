@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import charactersRoutes from './routes/characters.js';
 import usersRoutes from './routes/users.js';
+import availabilitiesRoutes from './routes/availabilities.js';
 import authRoutes from './routes/auth.js';
 
 dotenv.config();
@@ -22,6 +23,7 @@ app.use(cors({ origin: '*' }));
 app.use('/characters', charactersRoutes);
 app.use('/auth', authRoutes);
 app.use('/users', usersRoutes);
+app.use('/availabilities', availabilitiesRoutes);
 
 app.listen(port, () => {
   console.log(`⚡️[server]: Server is running at https://localhost:${port}`);
