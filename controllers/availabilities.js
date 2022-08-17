@@ -38,7 +38,7 @@ export const supressPastDate = async (availabilities) => {
   let error;
   availabilities.forEach((el) => {
     if (!error) {
-      if (new Date(el.date) < new Date()) {
+      if (new Date(+el.date) < new Date()) {
         try {
           supressElement(el._id);
         } catch (err) {
@@ -106,7 +106,9 @@ export const getAvailabilities = async (req, res) => {
     if (error) res.status(500).json(error);
     else {
       availabilities = await Availability.find();
-      res.status(200).json(availabilities.map((el) => formatAvailibilityOfResponse(el)));
+      res.status(200).json(availabilities.sort((a, b) => (+a.date) - (+b.date)).map(
+        (el) => formatAvailibilityOfResponse(el),
+      ));
     }
   } else res.status(403).json('Unautharized');
 };

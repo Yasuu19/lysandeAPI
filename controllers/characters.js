@@ -1,7 +1,5 @@
 /* eslint-disable no-await-in-loop */
-import Availabity from '../models/Availabity.js';
 import Character from '../models/character.js';
-import { supressPastDate, formatAvailibilityOfResponse } from './availabilities.js';
 
 const isPlayerCharacter = async (playerId, characterId) => {
   const characterFromDB = await Character.findOne({ _id: characterId });
@@ -171,21 +169,6 @@ export const getCharacterById = async (req, res) => {
   try {
     const character = await Character.findOne({ _id: req.params.id });
     res.status(200).json(character ? formatSending(character) : undefined);
-  } catch (err) {
-    res.status(404).json(`${err}`);
-  }
-};
-
-export const getAvailabilities = async (req, res) => {
-  try {
-    let availabilities = await Availabity.find({ user: req.auth.userId });
-    const error = await supressPastDate(availabilities);
-    if (error) {
-      res.status(500).json(error);
-    } else {
-      availabilities = await Availabity.find({ user: req.auth.userId });
-      res.status(200).json(availabilities.map((el) => formatAvailibilityOfResponse(el)));
-    }
   } catch (err) {
     res.status(404).json(`${err}`);
   }

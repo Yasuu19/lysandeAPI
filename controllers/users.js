@@ -1,6 +1,8 @@
 import { formatSending } from './characters.js';
 import Character from '../models/character.js';
 import User from '../models/User.js';
+import Availabity from '../models/Availabity.js';
+import { supressPastDate, formatAvailibilityOfResponse } from './availabilities.js';
 
 const formatUser = (data) => ({
   id: data._id,
@@ -58,3 +60,18 @@ export async function getUserCharacters(req, res) {
     res.status(403).json('Unauthorized request');
   }
 }
+
+export const getAvailabilities = async (req, res) => {
+  try {
+    let availabilities = await Availabity.find({ user: req.auth.userId });
+    const error = await supressPastDate(availabilities);
+    if (error) {
+      res.status(500).json(error);
+    } else {
+      availabilities = await Availabity.find({ user: req.auth.userId });
+      res.status(200).json(availabilities.map((el) => formatAvailibilityOfResponse(el)));
+    }
+  } catch (err) {
+    res.status(404).json(`${err}`);
+  }
+};

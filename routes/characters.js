@@ -8,7 +8,6 @@ import {
   deleteCharacter,
   getAllCharacters,
   getCharacterById,
-  getAvailabilities,
 } from '../controllers/characters.js';
 
 const router = express.Router();
@@ -16,7 +15,6 @@ const router = express.Router();
 router.post('/', auth, createCharacter);
 router.put('/', auth, updateCharacters);
 router.delete('/:id', auth, deleteCharacter);
-router.get('/availabilities', auth, getAvailabilities);
 router.get('/', auth, getAllCharacters);
 router.get('/:id', auth, getCharacterById);
 
