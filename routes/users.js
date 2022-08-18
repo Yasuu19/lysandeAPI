@@ -1,9 +1,8 @@
 import express from 'express';
 // eslint-disable-next-line import/no-named-as-default
 import auth from '../middlewares/auth.js';
-import { getAvailabilities } from '../controllers/availabilities.js';
 import {
-  getUser, getAllUsers, getUserCharacters,
+  getUser, getAllUsers, getUserCharacters, getAvailabilities,
 } from '../controllers/users.js';
 
 const router = express.Router();
