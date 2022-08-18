@@ -1,5 +1,6 @@
 import Session from '../models/Session.js';
 import CharacterOfSession from '../models/CharacterOfSession.js';
+import { setSessionAvailability } from './availabilities.js';
 
 const formatReq = (req) => ({
   date: req.body.date,
@@ -42,9 +43,23 @@ export const createSession = async (req, res) => {
       try {
         const newSession = await session.save();
         saveCharactersOfSession(req.body.characters, newSession._id);
+        const updateAvailabilityGM = await setSessionAvailability(
+          req.body.date,
+          req.body.moment,
+          req.auth.userId,
+        );
+        if (updateAvailabilityGM !== 0) throw new Error(updateAvailabilityGM);
+        req.body.characters.forEach(async (el) => {
+          const updateAvailability = await setSessionAvailability(
+            req.body.date,
+            req.body.moment,
+            el,
+          );
+          if (updateAvailability !== 0) throw new Error(updateAvailability);
+        });
         res.status(201).json({ session });
       } catch (err) {
-        res.status(400).json(err);
+        res.status(500).json(err);
       }
     } else res.status(400).json({ err: 'Wrong format' });
   }
