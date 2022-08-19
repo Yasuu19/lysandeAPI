@@ -109,10 +109,11 @@ export const getSessions = async (req, res) => {
       const sessionsId = sessions[i]._id.toHexString();
       const charactersOfSession = await getCharactersOfSession(sessionsId);
       formatSessions.push({
-        _id: sessions[i]._id,
+        id: sessions[i]._id,
         platform: sessions[i].platform,
         moment: sessions[i].moment,
-        dates: sessions[i].dates,
+        date: sessions[i].date,
+        gm: sessions[i].gm,
         characters: [...charactersOfSession],
       });
     }

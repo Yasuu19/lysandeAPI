@@ -3,12 +3,21 @@ import Availabity from '../models/Availabity.js';
 import { supressPastDate, formatAvailibilityOfResponse } from './availabilities.js';
 import { getCharactersByUser } from './characters.js';
 
-const formatUser = (data) => ({
-  id: data._id,
-  email: data.email,
-  name: data.name,
-  role: data.role,
-});
+const formatUser = (data, role) => {
+  if (role === 'admin') {
+    return {
+      id: data._id,
+      email: data.email,
+      name: data.name,
+      role: data.role,
+    };
+  }
+  return {
+    id: data._id,
+    name: data.name,
+    role: data.role,
+  };
+};
 
 export async function getUser(req, res) {
   if (
@@ -29,8 +38,7 @@ export async function getUser(req, res) {
 
 export async function getAllUsers(req, res) {
   if (
-    req.auth.role === 'admin'
-    || req.auth.role === 'gm'
+    req.auth.role
   ) {
     try {
       const users = await User.find({});
