@@ -1,8 +1,7 @@
-import { formatSending } from './characters.js';
-import Character from '../models/character.js';
 import User from '../models/User.js';
 import Availabity from '../models/Availabity.js';
 import { supressPastDate, formatAvailibilityOfResponse } from './availabilities.js';
+import { getCharactersByUser } from './characters.js';
 
 const formatUser = (data) => ({
   id: data._id,
@@ -51,10 +50,11 @@ export async function getUserCharacters(req, res) {
     || req.params.id === req.auth.userId
   ) {
     try {
-      const characters = await Character.find({ player: req.params.id });
-      res.status(200).json(characters.map((el) => formatSending(el)));
+      const character = await getCharactersByUser(req.auth.userId);
+      if (character.err) throw new Error(character.err);
+      res.status(200).json(character);
     } catch (err) {
-      res.status(500).json(err);
+      res.status(403).json(err);
     }
   } else {
     res.status(403).json('Unauthorized request');

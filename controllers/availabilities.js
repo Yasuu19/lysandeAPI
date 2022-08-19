@@ -112,3 +112,25 @@ export const getAvailabilities = async (req, res) => {
     }
   } else res.status(403).json('Unautharized');
 };
+
+export const setSessionAvailability = async (date, moment, userId) => {
+  try {
+    await Availability.updateOne({
+      date,
+      moment: 'journée',
+      user: userId,
+    }, {
+      platform: moment === 'journée' ? 'in-game' : 'rest',
+    });
+    await Availability.updateOne({
+      date,
+      moment: 'soirée',
+      user: userId,
+    }, {
+      platform: moment === 'soirée' ? 'in-game' : 'rest',
+    });
+  } catch (error) {
+    return error;
+  }
+  return 0;
+};

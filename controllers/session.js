@@ -1,6 +1,9 @@
+/* eslint-disable no-await-in-loop */
 import Session from '../models/Session.js';
 import CharacterOfSession from '../models/CharacterOfSession.js';
+import Character from '../models/character.js';
 import { setSessionAvailability } from './availabilities.js';
+import { getCharactersByUser } from './characters.js';
 
 const formatReq = (req) => ({
   date: req.body.date,
@@ -8,6 +11,20 @@ const formatReq = (req) => ({
   platform: req.body.platform,
   gm: req.auth.userId,
 });
+
+const getCharactersOfSession = async (sessionId) => {
+  try {
+    const sessionCharacters = await CharacterOfSession.find({ session: sessionId });
+    const characters = [];
+    for (let i = 0; i < sessionCharacters.length; i++) {
+      const currentCharacter = await Character.findOne({ _id: sessionCharacters[i].character });
+      characters.push(currentCharacter);
+    }
+    return characters;
+  } catch (error) {
+    return error;
+  }
+};
 
 const saveCharactersOfSession = async (characters, sessionId) => {
   characters.forEach(async (el) => {
@@ -19,16 +36,6 @@ const saveCharactersOfSession = async (characters, sessionId) => {
       await characterSession.save();
     }
   });
-};
-
-export const getCharactersOfSession = async (sessionId) => {
-  const characters = [];
-  const charactersOfSession = await Session.findOne({ session: sessionId });
-  charactersOfSession.forEach(async (el) => {
-    const character = await Session.findOne({ _id: el.character });
-    characters.push(character);
-  });
-  return characters;
 };
 
 export const createSession = async (req, res) => {
@@ -66,24 +73,61 @@ export const createSession = async (req, res) => {
 };
 
 export const getSession = async (req, res) => {
-  console.log(res, req);
   try {
-    // const character = await Session.findOne({ _id: req.params.id });
-  } catch (err) {
-    // res.status(404).json(`${err}`);
+    const playersCharacters = await getCharactersByUser();
+    const session = await Session.findOne({ _id: req.params.id }).exec();
+    const charactersOfSession = await getCharactersOfSession(req.params.id);
+    const response = ({
+      _id: session._id,
+      platform: session.platform,
+      moment: session.moment,
+      dates: session.dates,
+      characters: [...charactersOfSession],
+    });
+    const acces = (req.auth.role === 'admin'
+    || response.some(
+      (el) => el.gm === req.auth.userId
+              || el.characters.some(
+                (sessionCharacter) => playersCharacters.some(
+                  (playersCharacter) => sessionCharacter.id === playersCharacter.id,
+                ),
+              ),
+    ));
+    if (acces) res.status(200).json(response);
+    else res.status(403).json({ error: 'Unauthorized' });
+  } catch (error) {
+    res.status(500).json(error);
   }
 };
 
 export const getSessions = async (req, res) => {
-  if (
-    req.auth.role === 'admin'
-    || req.auth.role === 'gm'
-  ) {
-    const session = await Session.find({});
-    res.status(200).json(session);
-  } else res.status(501).json({ err: 'Unauthorized' });
-};
-
-export const updateSessions = () => {
-
+  try {
+    const playersCharacters = await getCharactersByUser();
+    const sessions = await Session.find({}).exec();
+    const formatSessions = [];
+    for (let i = 0; i < sessions.length; i++) {
+      const sessionsId = sessions[i]._id.toHexString();
+      const charactersOfSession = await getCharactersOfSession(sessionsId);
+      formatSessions.push({
+        _id: sessions[i]._id,
+        platform: sessions[i].platform,
+        moment: sessions[i].moment,
+        dates: sessions[i].dates,
+        characters: [...charactersOfSession],
+      });
+    }
+    res.status(200).json(
+      req.auth.role === 'admin' ? formatSessions
+        : formatSessions.filter(
+          (el) => el.gm === req.auth.userId
+                    || el.characters.some(
+                      (sessionCharacter) => playersCharacters.some(
+                        (playersCharacter) => sessionCharacter.id === playersCharacter.id,
+                      ),
+                    ),
+        ),
+    );
+  } catch (error) {
+    res.status(500).json(error);
+  }
 };

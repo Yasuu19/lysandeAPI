@@ -182,3 +182,12 @@ export const getUserIdByCharacterId = async (characterId) => {
     return { err: error };
   }
 };
+
+export const getCharactersByUser = async (userId) => {
+  try {
+    const characters = await Character.find({ player: userId });
+    return (characters.map((el) => formatSending(el)));
+  } catch (err) {
+    return err;
+  }
+};
