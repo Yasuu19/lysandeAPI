@@ -17,6 +17,14 @@ const sessionSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  description: {
+    type: String,
+    required: false,
+  },
+  title: {
+    type: String,
+    required: false,
+  },
 });
 
 export default mongoose.model('Session', sessionSchema);

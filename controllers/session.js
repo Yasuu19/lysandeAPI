@@ -1,3 +1,4 @@
+/* eslint-disable arrow-body-style */
 /* eslint-disable no-await-in-loop */
 import Session from '../models/Session.js';
 import CharacterOfSession from '../models/CharacterOfSession.js';
@@ -29,6 +30,7 @@ const getCharactersOfSession = async (sessionId) => {
 const saveCharactersOfSession = async (characters, sessionId) => {
   characters.forEach(async (el) => {
     if (el && sessionId) {
+      await Character.updateOne({ _id: el }, { quest: sessionId });
       const characterSession = new CharacterOfSession({
         character: el,
         session: sessionId,
@@ -74,27 +76,28 @@ export const createSession = async (req, res) => {
 
 export const getSession = async (req, res) => {
   try {
-    const playersCharacters = await getCharactersByUser();
+    const playersCharacters = await getCharactersByUser(req.auth.userId);
     const session = await Session.findOne({ _id: req.params.id }).exec();
     const charactersOfSession = await getCharactersOfSession(req.params.id);
     const response = ({
-      _id: session._id,
+      id: session._id,
       platform: session.platform,
       moment: session.moment,
-      dates: session.dates,
+      date: session.date,
+      gm: session.gm,
+      title: session.title,
+      description: session.description,
       characters: [...charactersOfSession],
     });
-    const acces = (req.auth.role === 'admin'
-    || response.some(
-      (el) => el.gm === req.auth.userId
-              || el.characters.some(
-                (sessionCharacter) => playersCharacters.some(
-                  (playersCharacter) => sessionCharacter.id === playersCharacter.id,
-                ),
-              ),
-    ));
-    if (acces) res.status(200).json(response);
-    else res.status(403).json({ error: 'Unauthorized' });
+    const access = req.auth.role === 'admin'
+                || session.gm === req.auth.userId
+                || charactersOfSession.some((characterOfSession) => playersCharacters.find(
+                  (playerCharacter) => (
+                    playerCharacter.id.toHexString() === characterOfSession._id.toHexString()
+                  ),
+                ));
+    if (access) res.status(200).json(response);
+    else throw new Error('Unauthorized');
   } catch (error) {
     res.status(500).json(error);
   }
@@ -102,7 +105,7 @@ export const getSession = async (req, res) => {
 
 export const getSessions = async (req, res) => {
   try {
-    const playersCharacters = await getCharactersByUser();
+    const playersCharacters = await getCharactersByUser(req.auth.userId);
     const sessions = await Session.find({}).exec();
     const formatSessions = [];
     for (let i = 0; i < sessions.length; i++) {
@@ -114,20 +117,43 @@ export const getSessions = async (req, res) => {
         moment: sessions[i].moment,
         date: sessions[i].date,
         gm: sessions[i].gm,
+        title: sessions[i].title,
+        description: sessions[i].description,
         characters: [...charactersOfSession],
       });
     }
     res.status(200).json(
-      req.auth.role === 'admin' ? formatSessions
-        : formatSessions.filter(
-          (el) => el.gm === req.auth.userId
-                    || el.characters.some(
-                      (sessionCharacter) => playersCharacters.some(
-                        (playersCharacter) => sessionCharacter.id === playersCharacter.id,
-                      ),
-                    ),
-        ),
+      formatSessions.filter((session) => (
+        req.auth.role === 'admin'
+              || session.gm === req.auth.userId
+              || session.characters.some((characterOfSession) => playersCharacters.find(
+                (playerCharacter) => (
+                  playerCharacter.id.toHexString() === characterOfSession._id.toHexString()
+                ),
+              )))),
     );
+  } catch (error) {
+    res.status(500).json(error);
+  }
+};
+
+export const updateSession = async (req, res) => {
+  try {
+    const playersCharacters = await getCharactersByUser(req.auth.userId);
+    const session = await Session.findOne({ _id: req.params.id }).exec();
+    const charactersOfSession = await getCharactersOfSession(req.params.id);
+    const access = req.auth.role === 'admin'
+                || session.gm === req.auth.userId
+                || charactersOfSession.some((characterOfSession) => playersCharacters.find(
+                  (playerCharacter) => (
+                    playerCharacter.id.toHexString() === characterOfSession._id.toHexString()
+                  ),
+                ));
+    if (access) {
+      await Session.updateOne({ _id: req.params.id }, req.body);
+      const responseBody = await Session.findOne({ _id: req.params.id }).exec();
+      res.status(200).json(responseBody);
+    } else throw new Error('Unauthorized');
   } catch (error) {
     res.status(500).json(error);
   }
