@@ -3,7 +3,11 @@ import express from 'express';
 import auth from '../middlewares/auth.js';
 
 import {
-  createCharacter, updateCharacters, deleteCharacter, getAllCharacters, getCharacterById,
+  createCharacter,
+  updateCharacters,
+  deleteCharacter,
+  getAllCharacters,
+  getCharacterById,
 } from '../controllers/characters.js';
 
 const router = express.Router();

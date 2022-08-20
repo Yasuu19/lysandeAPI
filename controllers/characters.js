@@ -173,3 +173,21 @@ export const getCharacterById = async (req, res) => {
     res.status(404).json(`${err}`);
   }
 };
+
+export const getUserIdByCharacterId = async (characterId) => {
+  try {
+    const character = await Character.findOne({ _id: characterId });
+    return character.player;
+  } catch (error) {
+    return { err: error };
+  }
+};
+
+export const getCharactersByUser = async (userId) => {
+  try {
+    const characters = await Character.find({ player: userId });
+    return (characters.map((el) => formatSending(el)));
+  } catch (err) {
+    return err;
+  }
+};

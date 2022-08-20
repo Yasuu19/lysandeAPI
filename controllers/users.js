@@ -1,13 +1,23 @@
-import { formatSending } from './characters.js';
-import Character from '../models/character.js';
 import User from '../models/User.js';
+import Availabity from '../models/Availabity.js';
+import { supressPastDate, formatAvailibilityOfResponse } from './availabilities.js';
+import { getCharactersByUser } from './characters.js';
 
-const formatUser = (data) => ({
-  id: data._id,
-  email: data.email,
-  name: data.name,
-  role: data.role,
-});
+const formatUser = (data, role) => {
+  if (role === 'admin') {
+    return {
+      id: data._id,
+      email: data.email,
+      name: data.name,
+      role: data.role,
+    };
+  }
+  return {
+    id: data._id,
+    name: data.name,
+    role: data.role,
+  };
+};
 
 export async function getUser(req, res) {
   if (
@@ -28,8 +38,7 @@ export async function getUser(req, res) {
 
 export async function getAllUsers(req, res) {
   if (
-    req.auth.role === 'admin'
-    || req.auth.role === 'gm'
+    req.auth.role
   ) {
     try {
       const users = await User.find({});
@@ -49,12 +58,28 @@ export async function getUserCharacters(req, res) {
     || req.params.id === req.auth.userId
   ) {
     try {
-      const characters = await Character.find({ player: req.params.id });
-      res.status(200).json(characters.map((el) => formatSending(el)));
+      const character = await getCharactersByUser(req.auth.userId);
+      if (character.err) throw new Error(character.err);
+      res.status(200).json(character);
     } catch (err) {
-      res.status(500).json(err);
+      res.status(403).json(err);
     }
   } else {
     res.status(403).json('Unauthorized request');
   }
 }
+
+export const getAvailabilities = async (req, res) => {
+  try {
+    let availabilities = await Availabity.find({ user: req.auth.userId });
+    const error = await supressPastDate(availabilities);
+    if (error) {
+      res.status(500).json(error);
+    } else {
+      availabilities = await Availabity.find({ user: req.auth.userId });
+      res.status(200).json(availabilities.map((el) => formatAvailibilityOfResponse(el)));
+    }
+  } catch (err) {
+    res.status(404).json(`${err}`);
+  }
+};

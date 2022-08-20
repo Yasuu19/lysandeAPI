@@ -47,7 +47,7 @@ const characterSchema = new mongoose.Schema({
 
   },
   quest: {
-    type: Number,
+    type: String,
     required: false,
   },
   story: {
