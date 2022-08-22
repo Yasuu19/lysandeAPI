@@ -1,6 +1,6 @@
 import Availability from '../models/Availabity.js';
 
-const formatDate = (date) => new Date(date).setHours(0, 0, 0, 0);
+const formatDate = (date) => new Date(date).getTime();
 
 const formatAvailibilityOfRequest = (el, user) => {
   const date = formatDate(el.at.date);
