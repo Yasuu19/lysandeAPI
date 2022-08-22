@@ -3,7 +3,9 @@ import Availability from '../models/Availabity.js';
 const formatDate = (date) => new Date(date).getTime();
 
 const formatAvailibilityOfRequest = (el, user) => {
+  console.log(0, el.at.date);
   const date = formatDate(el.at.date);
+  console.log(1, date);
   return {
     date,
     moment: el.at.moment,
