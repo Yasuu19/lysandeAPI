@@ -1,18 +1,11 @@
 import Availability from '../models/Availabity.js';
 
-const formatDate = (date) => new Date(date).getTime();
-
-const formatAvailibilityOfRequest = (el, user) => {
-  console.log(0, el.at.date);
-  const date = formatDate(el.at.date);
-  console.log(1, date);
-  return {
-    date,
-    moment: el.at.moment,
-    platform: el.platform,
-    user,
-  };
-};
+const formatAvailibilityOfRequest = (el, user) => ({
+  date: el.at.date,
+  moment: el.at.moment,
+  platform: el.platform,
+  user,
+});
 
 export const formatAvailibilityOfResponse = (el) => ({
   at: {
@@ -24,9 +17,8 @@ export const formatAvailibilityOfResponse = (el) => ({
 });
 
 const getAvailabilityByData = async (date, moment, user) => {
-  const dateFormat = formatDate(date);
   try {
-    const availability = await Availability.findOne({ date: dateFormat, moment, user });
+    const availability = await Availability.findOne({ date, moment, user });
     return availability;
   } catch (err) {
     return err;
