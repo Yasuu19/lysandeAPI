@@ -83,3 +83,13 @@ export const getAvailabilities = async (req, res) => {
     res.status(404).json(`${err}`);
   }
 };
+
+export const deleteUser = async (req, res) => {
+  try {
+    if (req.auth.role !== 'admin') throw new Error('Unauthorized');
+    await User.deleteOne({ _id: req.params.id });
+    res.status(200).json(1);
+  } catch (err) {
+    res.status(500).json(err);
+  }
+};
