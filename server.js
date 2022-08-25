@@ -13,7 +13,7 @@ const app = express();
 const port = 3001;
 
 const dbURL = process.env.DB_URL || 'localhost';
-mongoose.connect(`mongodb://${dbURL}/lysande`);
+mongoose.connect(`mongodb://${dbURL}/lyssande`);
 const db = mongoose.connection;
 db.on('error', (error) => console.error(error));
 db.once('open', () => console.error('⚡️[DB]: Database MongoDB is connected'));

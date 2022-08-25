@@ -13,4 +13,4 @@ jobs:
           privateKey: ${{ secrets.SSH_PRIVATE_KEY }} 
           username: ${{ secrets.USERNAME }} 
           host: ${{ secrets.SERVER }} 
-          command : cd lysandeAPI && ./deploy.sh
+          command : cd lyssandeAPI && ./deploy.sh
