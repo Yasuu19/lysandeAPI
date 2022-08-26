@@ -76,7 +76,7 @@ const formatRequest = (data) => ({
   race: data.race,
   job: data.job,
   level: data.level,
-  img: data.img || 'https://nnsprod.com/naheulbeuk/images/gob.png',
+  img: data.img,
   culte: data.culte,
   ...formatRequestPosition(data),
   quest: data.quest,
@@ -90,6 +90,7 @@ export async function createCharacter(req, res) {
   if (Object.keys(req.body).length) {
     const character = new Character(formatRequest({ ...req.body, player: req.auth.userId }));
     try {
+      if (!character.img) character.img = 'https://nnsprod.com/naheulbeuk/images/gob.png';
       const newCharacter = await character.save();
       res.status(201).json(formatSending(newCharacter));
     } catch (err) {
