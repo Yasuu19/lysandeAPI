@@ -1,5 +1,5 @@
 /* eslint-disable no-await-in-loop */
-import Character from '../models/character.js';
+import Character from '../models/Character.js';
 
 const isPlayerCharacter = async (playerId, characterId) => {
   const characterFromDB = await Character.findOne({ _id: characterId });
@@ -76,7 +76,7 @@ const formatRequest = (data) => ({
   race: data.race,
   job: data.job,
   level: data.level,
-  img: 'https://nnsprod.com/naheulbeuk/images/gob.png',
+  img: data.img || 'https://nnsprod.com/naheulbeuk/images/gob.png',
   culte: data.culte,
   ...formatRequestPosition(data),
   quest: data.quest,
