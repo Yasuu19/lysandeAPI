@@ -158,3 +158,15 @@ export const updateSession = async (req, res) => {
     res.status(500).json(error);
   }
 };
+
+export const deleteSession = async (req, res) => {
+  try {
+    const access = req.auth.role === 'admin';
+    if (access) {
+      await Session.deleteOne({ _id: req.params.id });
+      await CharacterOfSession.deleteMany({ session: req.params.id });
+    } else throw new Error('Unauthorized');
+  } catch (error) {
+    res.status(500).json(error);
+  }
+};
