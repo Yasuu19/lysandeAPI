@@ -128,3 +128,14 @@ export const setSessionAvailability = async (date, moment, userId) => {
   }
   return 0;
 };
+
+export const deleteAllAvailabilities = async (req, res) => {
+  if (req.auth.role === 'admin') {
+    try {
+      await Availability.deleteMany();
+      res.status(200).json('All availabilities deleted');
+    } catch (err) {
+      res.status(500).json(err);
+    }
+  } else res.status(403).json('Unautharized');
+};
