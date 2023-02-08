@@ -8,27 +8,23 @@ dotenv.config();
 const secretTokenKey = process.env.SECRET_TOKEN_KEY || 'BETTERCALLSAUL';
 
 export async function signup(req, res) {
-  if (req.auth.role === 'admin') {
+  try {
+    const hash = await bcrypt.hash(req.body.password, 10);
     try {
-      const hash = await bcrypt.hash(req.body.password, 10);
-      try {
-        const user = new User({
-          email: req.body.email,
-          name: req.body.name,
-          role: req.body.role,
-          password: hash,
-        });
-        await user.save();
-        const { email, name, role } = user;
-        res.status(201).json({ email, name, role });
-      } catch (err) {
-        res.status(400).json(err);
-      }
+      const user = new User({
+        email: req.body.email,
+        name: req.body.name,
+        role: req.body.role,
+        password: hash,
+      });
+      await user.save();
+      const { email, name, role } = user;
+      res.status(201).json({ email, name, role });
     } catch (err) {
-      res.status(500).json(err);
+      res.status(400).json(err);
     }
-  } else {
-    res.status(403).json('Unauthorized');
+  } catch (err) {
+    res.status(500).json(err);
   }
 }
 export async function login(req, res) {
