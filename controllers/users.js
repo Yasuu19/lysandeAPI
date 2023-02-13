@@ -58,7 +58,7 @@ export async function getUserCharacters(req, res) {
     || req.params.id === req.auth.userId
   ) {
     try {
-      const character = await getCharactersByUser(req.auth.userId);
+      const character = await getCharactersByUser(req.params.id);
       if (character.err) throw new Error(character.err);
       res.status(200).json(character);
     } catch (err) {
@@ -88,6 +88,16 @@ export const deleteUser = async (req, res) => {
   try {
     if (req.auth.role !== 'admin') throw new Error('Unauthorized');
     await User.deleteOne({ _id: req.params.id });
+    res.status(200).json(1);
+  } catch (err) {
+    res.status(500).json(err);
+  }
+};
+
+export const deleteUserAvailabilities = async (req, res) => {
+  try {
+    if (req.auth.role !== 'admin') throw new Error('Unauthorized');
+    await Availabity.deleteMany({ user: req.params.id });
     res.status(200).json(1);
   } catch (err) {
     res.status(500).json(err);

@@ -100,7 +100,7 @@ export const getAvailabilities = async (req, res) => {
     if (error) res.status(500).json(error);
     else {
       availabilities = await Availability.find();
-      res.status(200).json(availabilities.sort((a, b) => (+a.date) - (+b.date)).map(
+      res.status(200).json(availabilities.map(
         (el) => formatAvailibilityOfResponse(el),
       ));
     }
